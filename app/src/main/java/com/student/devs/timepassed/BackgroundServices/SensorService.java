@@ -131,6 +131,7 @@ public class SensorService extends Service {
         timer.schedule(timerTask, 1000, 1000);
     }
 
+
     /**
      * it sets the timer to print the counter every x seconds
      */

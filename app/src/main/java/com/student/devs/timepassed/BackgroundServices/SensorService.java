@@ -55,6 +55,9 @@ public class SensorService extends Service {
     public boolean locked = false; // vrai si le téléphone est verrouiullé
     public int bigTimer = 0; // timer avant de considérer qu'il a passé assez de temps sur l'appli
     public int smallTimer = 0; // timer avant d'envoyer la notif
+
+    public int debugTimer = 0; // timer de debug a ne pas prendre  en compte pour le projet
+
     public int saveTime = 0; //Sauvegarde du temps de bigtimer, une fois le seuil save passé.
     public int savedBigTimer = 0; //Sauvegarde le bigTimer au moment ou on verrouille le téléphone
 
@@ -94,7 +97,7 @@ public class SensorService extends Service {
         //screenStateFilter.addAction(Intent.ACTION_SCREEN_ON); servait pour le test de Screen_ON
         registerReceiver(mScreenStateReceiver, screenStateFilter);
         Notification notification = new Notification();
-        startForeground(1234, notification);
+       //startForeground(1234, notification);
         return START_STICKY;
     }
 
@@ -202,21 +205,22 @@ public class SensorService extends Service {
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public void notification(View v) {
-        showNotification(this, "Test", "bienvenue", new Intent() );
+        showNotification(this, "Test", 42,"bienvenue", new Intent() );
     }
 
     /**
      * Permet d'envoyer la notification à l'utilisateur
      * @param context
      * @param title
+     * @param notificationId
      * @param body
      * @param intent
      */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    public void showNotification(Context context, String title, String body, Intent intent) {
+    public void showNotification(Context context, String title, int notificationId, String body, Intent intent) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        int notificationId = 1;
+        //int notificationId = 1;
         String channelId = "channel-01";
         String channelName = "Channel Name";
         int importance = NotificationManager.IMPORTANCE_HIGH;
@@ -305,7 +309,11 @@ public class SensorService extends Service {
                 int elspSec = (int) elapsedSeconds;*/
 
                 // TODO demander à l'utilisteur avec la notif
-                showNotification(getApplicationContext(), "Temps Passé", "Estimer le temps passé sur vos applications", new Intent());
+
+                // mis en commentaire pour le debug sur le téléphone d'Arnaud, a remettre dans la version finale !!
+                //showNotification(getApplicationContext(), "Temps Passé",1, "Estimer le temps passé sur vos applications", new Intent());
+
+
                 //startTime = SystemClock.elapsedRealtime();
                 Log.i("in timer", "Temps passé " + bigTimer + " sur " + prevApp);
 
@@ -321,6 +329,15 @@ public class SensorService extends Service {
 
             prevTickApp = currentApp;
 
+
+        }
+
+        debugTimer++;
+
+        if (debugTimer > 600){
+
+            debugTimer = 0;
+            showNotification(getApplicationContext(), "Debug",2 , "L'application tourne toujours en fond", new Intent());
 
         }
     }
